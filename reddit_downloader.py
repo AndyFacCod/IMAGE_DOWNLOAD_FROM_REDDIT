@@ -29,26 +29,29 @@ numerotare = 1
 for submission in subreddit.hot(limit=NUMBER_OF_DOWNLOADS):
 
     # Verificăm dacă postarea este o imagine
-    if submission.post_hint == "image":
+    if submission.url.endswith('.jpg') or submission.url.endswith('.png'):
 
-        # Obține numele utilizatorului care a postat imagini
-        author_name = submission.author.name
+        # Verificare dacă există un autor valid pentru postare
+        if submission.author is not None: 
+
+            # Obține numele utilizatorului care a postat imagini
+            author_name = submission.author.name
+                
+            # Creează numele fișierului prin concatenarea numelui utilizatorului și numărului aleatoriu
+            file_name = f"{numerotare}_{author_name}.jpg"
             
-        # Creează numele fișierului prin concatenarea numelui utilizatorului și numărului aleatoriu
-        file_name = f"{numerotare}_{author_name}.jpg"
-        
-        # Obține URL-ul imaginii din "SUBREDDIT_SELECT"
-        image_url = submission.url
-        
-        # Descarcă conținutul imaginii de la URL-ul specificat
-        image_content = requests.get(image_url).content
+            # Obține URL-ul imaginii din "SUBREDDIT_SELECT"
+            image_url = submission.url
+            
+            # Descarcă conținutul imaginii de la URL-ul specificat
+            image_content = requests.get(image_url).content
 
-        # Salvează conținutul imaginii într-un fișier cu numele specificat
-        with open(file_name, 'wb') as handler:
-            handler.write(image_content)
-        
-        # Crestem numerotartea imaginilor
-        numerotare = numerotare+1
+            # Salvează conținutul imaginii într-un fișier cu numele specificat
+            with open(file_name, 'wb') as handler:
+                handler.write(image_content)
+            
+            # Crestem numerotartea imaginilor
+            numerotare = numerotare+1
         
 # Verifică dacă există deja un director numit SUBREDDIT_SELECT în locul unde rulezi acest script
 if not os.path.exists(SUBREDDIT_SELECT):
@@ -58,3 +61,4 @@ if not os.path.exists(SUBREDDIT_SELECT):
 for file_name in os.listdir():
     if file_name.endswith('.jpg'):
         os.rename(file_name, f"{SUBREDDIT_SELECT}/{file_name}")  
+
